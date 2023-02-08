@@ -44,16 +44,17 @@ def download(session: Session, target_url: str, filename: str) -> str | None:
         return
     if filename == "":
         filename: str = target_url.split('/')[-1].split('?')[0] + ".csv"
+    filename_extension: str =filename.split('.')[-1]
     filename = join(download_dir, filename)
     with session.get(target_url, stream=True) as response:
         response.raise_for_status()
         if isfile(filename):
-            count = 1
+            count: int = 1
             while True:
-                if isfile(filename + '(' + count + ')'):
+                if isfile(filename[0:-(len(filename_extension)+1)] + '(' + str(count) + ').' + filename_extension):
                     count += 1
                 else:
-                    filename = filename + '(' + count + ')'
+                    filename = filename[0:-(len(filename_extension)+1)] + '(' + str(count) + ').' + filename_extension
                     break
         with open(filename, 'wb') as filestream:
             for chunk in response.iter_content(chunk_size=10*1024):
